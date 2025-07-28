@@ -5,21 +5,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-# GroqLLM class to interact with Groq's LLM service
-# It uses the ChatGroq client to send prompts and receive responses.
 class GroqLLM:
     def __init__(self):
-        # Initialize the Groq client with the API key from environment variables
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY environment variable not set")
+        
         self.llm = ChatGroq(
-            api_key=os.getenv("GROQ_API_KEY"),
-            model="llama-3.1-8b-instant",
+            api_key=api_key,
+            model="llama3-8b-8192",
             max_retries=3,
             timeout=60,
         )
     
     def get_llm(self):
-        """
-        Returns the Groq client instance.
-        This method is used to access the Groq client for sending prompts.
-        """
+        """Returns the Groq client instance."""
         return self.llm
+
