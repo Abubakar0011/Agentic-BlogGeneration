@@ -1,6 +1,7 @@
 from src.States.blogstate import BlogState
 from langchain_core.messages import SystemMessage, HumanMessage
 from src.States.blogstate import Blog
+from langgraph.graph import END
 
 
 # Nodes
@@ -40,7 +41,7 @@ class BlogNode:
         Content to translate:
         {blog_content}
         """
-        
+
         try:
             messages = [
                 HumanMessage(
@@ -50,16 +51,17 @@ class BlogNode:
                     )
                 )
             ]
-            
+
             # First try structured output
             try:
-                translation_content = self.llm.with_structured_output(Blog).invoke(messages)
+                translation_content = self.llm.with_structured_output(
+                    Blog).invoke(messages)
                 return {"blog": {"content": translation_content.content}}
             except Exception:
                 # Fallback to regular completion if structured output fails
                 response = self.llm.invoke(messages)
                 return {"blog": {"content": response.content}}
-                
+
         except Exception as e:
             print(f"Translation failed: {e}")
             return {"blog": {"content": f"Translation failed: {str(e)}"}}
@@ -69,17 +71,32 @@ class BlogNode:
         return {"current_language": state.current_language}
 
     def route_decision(self, state: BlogState) -> str:
-        """Determine translation route based on language."""
+        """Route the content to the respective translation function."""
+        language = state.current_language.lower()
+        
+        # Map all possible return values including English
         language_map = {
-            "hindi": "hindi",
-            "french": "french",
-            "urdu": "urdu",
-            "pashto": "pashto",
-            "german": "german",
-            "arabic": "arabic",
-            "russian": "russian"
+            "hindi": "hindi_translation",
+            "french": "french_translation", 
+            "urdu": "urdu_translation",
+            "pashto": "pashto_translation",
+            "german": "german_translation",
+            "arabic": "arabic_translation",
+            "russian": "russian_translation",
+            "english": "__end__"  # Special key for English
         }
-        return language_map.get(state.current_language.lower(), "english")
+        
+        return language_map.get(language, "__end__")  # Default to end for unknown languages
 
-    
-
+    # def route_decision(self, state: BlogState) -> str:
+    #     """Determine translation route based on language."""
+    #     language_map = {
+    #         "hindi": "hindi",
+    #         "french": "french",
+    #         "urdu": "urdu",
+    #         "pashto": "pashto",
+    #         "german": "german",
+    #         "arabic": "arabic",
+    #         "russian": "russian"
+    #     }
+    #     return language_map.get(state.current_language.lower(), "english")

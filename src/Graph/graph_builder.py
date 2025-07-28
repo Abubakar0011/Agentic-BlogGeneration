@@ -27,10 +27,24 @@ class GraphBuilder:
             self.graph.add_conditional_edges(
                 "route",
                 self.blog_node.route_decision,
-                {lang: f"{lang}_translation" for lang in [
-                    "hindi", "french", "urdu", "pashto", "german", "arabic", "russian"
-                ]}
+                {
+                    "hindi_translation": "hindi_translation",
+                    "french_translation": "french_translation",
+                    "urdu_translation": "urdu_translation",
+                    "pashto_translation": "pashto_translation",
+                    "german_translation": "german_translation",
+                    "arabic_translation": "arabic_translation",
+                    "russian_translation": "russian_translation",
+                    "__end__": END  # Handle English and unknown languages
+                }
             )
+            # self.graph.add_conditional_edges(
+            #     "route",
+            #     self.blog_node.route_decision,
+            #     {lang: f"{lang}_translation" for lang in [
+            #         "hindi", "french", "urdu", "pashto", "german", "arabic", "russian"
+            #     ]}
+            # )
             for lang in ["hindi", "french", "urdu", "pashto", "german", "arabic", "russian"]:
                 self.graph.add_edge(f"{lang}_translation", END)
         else:
